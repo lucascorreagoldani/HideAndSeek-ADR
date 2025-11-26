@@ -98,26 +98,20 @@ public class GameListener implements Listener {
         }
 
         if (vitima.getHealth() - e.getFinalDamage() <= 0) {
-
             if (teamManager.isEscondedor(vitima)) {
                 e.setCancelled(true);
                 Bukkit.broadcastMessage(ChatColor.RED + "☠ " + ChatColor.YELLOW + vitima.getName() +
                         ChatColor.GRAY + " morreu para o ambiente e virou um " + ChatColor.RED + "PROCURADOR!");
                 gameManager.tornarPegador(vitima, true);
             }
-
             else if (teamManager.isPegador(vitima)) {
                 e.setCancelled(true);
-
                 Location respawn = configManager.getLocation("pegador_spawn");
                 if (respawn != null) vitima.teleport(respawn);
-
                 vitima.setHealth(20);
                 vitima.setFoodLevel(20);
-
                 vitima.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30 * 20, 0));
                 configManager.darKit(vitima, "pegador");
-
                 vitima.sendMessage(ChatColor.RED + "☠ VOCÊ MORREU!");
                 vitima.sendMessage(ChatColor.GRAY + "Cuidado com o ambiente. Você renasceu no início.");
             }
@@ -177,10 +171,12 @@ public class GameListener implements Listener {
             if (teamManager.isPegador(p)) {
                 Location spawn = configManager.getLocation("pegador_spawn");
                 if (spawn != null) e.setRespawnLocation(spawn);
-
                 configManager.darKit(p, "pegador");
                 p.setGlowing(true);
             }
+        } else {
+            Location lobby = configManager.getLocation("lobby_spawn");
+            if (lobby != null) e.setRespawnLocation(lobby);
         }
     }
 
@@ -194,19 +190,27 @@ public class GameListener implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         e.setJoinMessage(null);
         Player p = e.getPlayer();
+
         gameManager.resetarJogador(p);
+
+        Location lobby = configManager.getLocation("lobby_spawn");
+        if (lobby != null) {
+            p.teleport(lobby);
+        } else if (p.isOp()) {
+            p.sendMessage(ChatColor.RED + "AVISO: O spawn principal (lobby_spawn) ainda não foi definido! Use /hs spawn set");
+        }
 
         if (gameManager.getEstado() == GameManager.GameState.JOGANDO || gameManager.getEstado() == GameManager.GameState.ESCONDENDO) {
             p.setGameMode(GameMode.SPECTATOR);
-            p.sendMessage(ChatColor.GRAY + "Partida em andamento. Você é um espectador.");
+            p.sendMessage(ChatColor.GRAY + "Partida em andamento. Você entrou como espectador.");
         } else {
             if (configManager.isBlacklisted(p.getName())) {
                 p.setGameMode(GameMode.SPECTATOR);
                 p.sendMessage(ChatColor.RED + "Você está na Blacklist.");
             } else {
-                gameManager.setupEscondedor(p);
-                Location loc = configManager.getLocation("escondedor_spawn");
-                if (loc != null) p.teleport(loc);
+                teamManager.addEscondedor(p);
+                p.setGameMode(GameMode.ADVENTURE);
+                p.sendMessage(ChatColor.GREEN + "Você entrou no jogo! Aguarde o início.");
             }
         }
     }
