@@ -1,6 +1,7 @@
 package com.xxxlc.hideandseek.manager;
 
 import com.xxxlc.hideandseek.HideAndSeek;
+import com.xxxlc.hideandseek.util.MessageUtil;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -43,6 +44,24 @@ public class GameManager {
 
     public void cancelarLoop() {
         if (task != null && !task.isCancelled()) task.cancel();
+    }
+
+    public void forcarParada() {
+        estadoAtual = GameState.AGUARDANDO;
+        timer = 0;
+
+        Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "O JOGO FOI PARADO FORÇADAMENTE POR UM ADMINISTRADOR.");
+        broadcastSound(Sound.BLOCK_NOTE_BLOCK_BASS, 1f);
+
+        Location end = configManager.getLocation("end_spawn");
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (end != null) p.teleport(end);
+            resetarJogador(p);
+            p.setGameMode(GameMode.ADVENTURE);
+            p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+        }
+
+        teamManager.clearLists();
     }
 
     private void tick() {
