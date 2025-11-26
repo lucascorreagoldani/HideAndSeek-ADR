@@ -1,4 +1,4 @@
-🕵️ HideAndSeek
+# 🕵️ HideAndSeek
 
 Um plugin de Esconde-Esconde com mecânica de "Infeção" e "A Fera", desenvolvido para eventos da ADR Studios.
 
