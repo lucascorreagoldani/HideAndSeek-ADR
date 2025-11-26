@@ -57,16 +57,21 @@ public class TeamManager {
         }
 
         if (board.getObjective("HideSeek") != null) board.getObjective("HideSeek").unregister();
-        Objective obj = board.registerNewObjective("HideSeek", Criteria.DUMMY, ChatColor.YELLOW + "" + ChatColor.BOLD + "ESCONDE-ESCONDE");
+
+        String titulo = ChatColor.translateAlternateColorCodes('&', "&b&lHIDE &fand &c&lSEEK");
+        Objective obj = board.registerNewObjective("HideSeek", Criteria.DUMMY, titulo);
+
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        setLine(obj, ChatColor.GRAY + "----------------", 7);
-        setLine(obj, ChatColor.WHITE + "Fase: " + ChatColor.GREEN + estado, 6);
-        setLine(obj, ChatColor.WHITE + "Tempo: " + ChatColor.YELLOW + formatTime(tempo), 5);
-        setLine(obj, " ", 4);
-        setLine(obj, ChatColor.RED + "Procuradores: " + listaPegadores.size(), 3);
-        setLine(obj, ChatColor.BLUE + "Escondedores: " + listaEscondedores.size(), 2);
-        setLine(obj, ChatColor.GRAY + "---------------- ", 1);
+        setLine(obj, ChatColor.GRAY + "----------------", 8);
+        setLine(obj, ChatColor.WHITE + "Fase: " + ChatColor.GREEN + estado, 7);
+        setLine(obj, ChatColor.WHITE + "Tempo: " + ChatColor.YELLOW + formatTime(tempo), 6);
+        setLine(obj, " ", 5);
+        setLine(obj, ChatColor.WHITE + "Equipe: " + getTeamName(p), 4);
+        setLine(obj, "  ", 3);
+        setLine(obj, ChatColor.RED + "Procuradores: " + listaPegadores.size(), 2);
+        setLine(obj, ChatColor.BLUE + "Escondedores: " + listaEscondedores.size(), 1);
+        setLine(obj, ChatColor.GRAY + "---------------- ", 0);
 
         Team timePeg = getOrCreateTeam(board, "Pegadores", ChatColor.RED, "[PROCURADOR] ");
         Team timeEsc = getOrCreateTeam(board, "Escondedores", ChatColor.BLUE, "[ESCONDEDOR] ");
@@ -77,6 +82,12 @@ public class TeamManager {
         }
 
         if (p.getScoreboard() != board) p.setScoreboard(board);
+    }
+
+    private String getTeamName(Player p) {
+        if (isPegador(p)) return ChatColor.RED + "Procurador";
+        if (isEscondedor(p)) return ChatColor.BLUE + "Escondedor";
+        return ChatColor.GRAY + "Espectador";
     }
 
     private void setLine(Objective obj, String text, int score) {
