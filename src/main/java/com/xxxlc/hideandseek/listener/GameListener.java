@@ -18,10 +18,13 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -38,6 +41,13 @@ public class GameListener implements Listener {
         this.gameManager = gm;
         this.teamManager = tm;
         this.configManager = cm;
+    }
+
+    @EventHandler
+    public void onItemDrop(PlayerDropItemEvent e) {
+        if (gameManager.getEstado() != GameManager.GameState.AGUARDANDO && !e.getPlayer().hasPermission("hs.admin")) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -81,12 +91,35 @@ public class GameListener implements Listener {
             return;
         }
 
-        if (teamManager.isEscondedor(vitima)) {
-            if (vitima.getHealth() - e.getFinalDamage() <= 0) {
+        if (e instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) e).getDamager() instanceof Player) {
+                return;
+            }
+        }
+
+        if (vitima.getHealth() - e.getFinalDamage() <= 0) {
+
+            if (teamManager.isEscondedor(vitima)) {
                 e.setCancelled(true);
                 Bukkit.broadcastMessage(ChatColor.RED + "☠ " + ChatColor.YELLOW + vitima.getName() +
-                        ChatColor.GRAY + " não resistiu aos ferimentos e virou um " + ChatColor.RED + "PROCURADOR!");
+                        ChatColor.GRAY + " morreu para o ambiente e virou um " + ChatColor.RED + "PROCURADOR!");
                 gameManager.tornarPegador(vitima, true);
+            }
+
+            else if (teamManager.isPegador(vitima)) {
+                e.setCancelled(true);
+
+                Location respawn = configManager.getLocation("pegador_spawn");
+                if (respawn != null) vitima.teleport(respawn);
+
+                vitima.setHealth(20);
+                vitima.setFoodLevel(20);
+
+                vitima.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30 * 20, 0));
+                configManager.darKit(vitima, "pegador");
+
+                vitima.sendMessage(ChatColor.RED + "☠ VOCÊ MORREU!");
+                vitima.sendMessage(ChatColor.GRAY + "Cuidado com o ambiente. Você renasceu no início.");
             }
         }
     }
@@ -126,11 +159,35 @@ public class GameListener implements Listener {
 
                 Location respawn = configManager.getLocation("pegador_spawn");
                 if (respawn != null) vitima.teleport(respawn);
+
                 vitima.setHealth(20);
                 vitima.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30 * 20, 0));
+
+                configManager.darKit(vitima, "pegador");
+
                 vitima.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "VOCÊ FOI ABATIDO!");
             }
         }
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent e) {
+        if (gameManager.getEstado() == GameManager.GameState.JOGANDO) {
+            Player p = e.getPlayer();
+            if (teamManager.isPegador(p)) {
+                Location spawn = configManager.getLocation("pegador_spawn");
+                if (spawn != null) e.setRespawnLocation(spawn);
+
+                configManager.darKit(p, "pegador");
+                p.setGlowing(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        e.setDeathMessage(null);
+        e.getDrops().clear();
     }
 
     @EventHandler
