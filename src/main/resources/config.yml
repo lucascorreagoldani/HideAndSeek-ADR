@@ -1,0 +1,49 @@
+# ---------------------------------------------------------
+#       CONFIGURAÇÃO - HIDE AND SEEK
+# ---------------------------------------------------------
+
+# Configurações de Tempo e Jogadores
+tempos:
+  # Quantidade mínima de jogadores para iniciar a contagem regressiva
+  min_players: 2
+
+  # Tempo (em segundos) que o Procurador fica preso na Sala de Espera
+  # Enquanto os Escondedores se espalham pelo mapa.
+  # Padrão: 120 segundos (2 minutos)
+  tempo_esconder: 120
+
+  # Duração da partida (em segundos) após o Procurador ser liberado.
+  # Padrão: 1200 segundos (20 minutos)
+  tempo_jogo: 1200
+
+# ---------------------------------------------------------
+# BLACKLIST
+# Jogadores nesta lista nunca serão o Procurador inicial do sorteio.
+# Se a partida começar, eles entram automaticamente como Espectadores.
+# Comandos: /hs blacklist add <nick>
+# ---------------------------------------------------------
+blacklist: []
+
+# ---------------------------------------------------------
+# ITENS INICIAIS
+# ATENÇÃO: Não edite esta seção manualmente, pois o formato dos itens
+# é complexo. Use os comandos dentro do jogo:
+# /hs itens pegador
+# /hs itens escondedor
+# ---------------------------------------------------------
+kits:
+  pegador: []
+  escondedor: []
+
+# ---------------------------------------------------------
+# SPAWNS
+# Não edite manualmente. Use os comandos para definir os locais:
+# /hs setpegadorespera  (Sala fechada de 2 min)
+# /hs pegadorspawn set  (Início do mapa / Respawn da fera)
+# /hs escondedorspawn set (Onde os escondedores nascem)
+# /hs endspawn set      (Lobby final pós-jogo)
+# ---------------------------------------------------------
+pegador_espera: null
+pegador_spawn: null
+escondedor_spawn: null
+end_spawn: null

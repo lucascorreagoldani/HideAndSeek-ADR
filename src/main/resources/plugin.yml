@@ -1,0 +1,14 @@
+name: HideAndSeek
+version: 1.0
+main: com.xxxlc.hideandseek.HideAndSeek
+api-version: 1.21
+authors: [xxxlc]
+commands:
+  hs:
+    description: Comando principal do Hide and Seek
+    usage: /hs help
+    aliases: [hideseek]
+permissions:
+  hs.admin:
+    description: Permissão para configurar partida de Hide and Seek
+    default: op
