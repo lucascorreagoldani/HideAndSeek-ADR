@@ -68,6 +68,23 @@ public class HideSeekCommand implements CommandExecutor, TabCompleter {
                 MessageUtil.sendSuccess(p, "O jogo foi parado e resetado.");
                 break;
 
+            case "spawn":
+                if (args.length < 2) {
+                    MessageUtil.sendUsage(p, "/hs spawn <set/remove>");
+                    return true;
+                }
+                if (args[1].equalsIgnoreCase("set")) {
+                    configManager.saveLocation("lobby_spawn", p.getLocation());
+                    MessageUtil.sendSuccess(p, "Spawn Principal (Lobby) definido com sucesso!");
+                } else if (args[1].equalsIgnoreCase("remove")) {
+                    plugin.getConfig().set("lobby_spawn", null);
+                    plugin.saveConfig();
+                    MessageUtil.sendSuccess(p, "Spawn Principal removido.");
+                } else {
+                    MessageUtil.sendUsage(p, "/hs spawn <set/remove>");
+                }
+                break;
+
             case "itens":
                 if (args.length < 2) {
                     MessageUtil.sendUsage(p, "/hs itens <pegador/escondedor>");
@@ -130,6 +147,7 @@ public class HideSeekCommand implements CommandExecutor, TabCompleter {
         MessageUtil.sendHelp(p, "Hide and Seek",
                 " &e /hs start &8- &7Inicia o ciclo do jogo",
                 " &e /hs stop &8- &7Para o jogo imediatamente",
+                " &e /hs spawn <set/remove> &8- &7Define o Lobby de entrada",
                 " &e /hs itens <kit> &8- &7Define kits iniciais",
                 " &e /hs pegadorspawn set &8- &7Define onde a fera nasce",
                 " &e /hs setpegadorespera &8- &7Define sala de espera (2min)",
@@ -187,12 +205,13 @@ public class HideSeekCommand implements CommandExecutor, TabCompleter {
         List<String> s = new ArrayList<>();
         if (args.length == 1) {
             s.add("start"); s.add("stop"); s.add("itens"); s.add("help"); s.add("info"); s.add("blacklist");
-            s.add("pegadorspawn"); s.add("escondedorspawn"); s.add("endspawn"); s.add("setpegadorespera");
+            s.add("spawn"); s.add("pegadorspawn"); s.add("escondedorspawn"); s.add("endspawn"); s.add("setpegadorespera");
             s.add("setminplayers"); s.add("settempopartida");
         }
         if (args.length == 2 && args[0].equals("itens")) { s.add("pegador"); s.add("escondedor"); }
         if (args.length == 2 && args[0].equals("blacklist")) { s.add("add"); s.add("remove"); s.add("list"); }
-        if (args.length == 2 && args[0].contains("spawn")) { s.add("set"); }
+        if (args.length == 2 && args[0].equals("spawn")) { s.add("set"); s.add("remove"); }
+        if (args.length == 2 && args[0].contains("spawn") && !args[0].equals("spawn")) { s.add("set"); }
         return s;
     }
 }
