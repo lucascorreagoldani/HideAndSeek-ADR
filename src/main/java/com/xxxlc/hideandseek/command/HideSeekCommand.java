@@ -6,7 +6,6 @@ import com.xxxlc.hideandseek.manager.GameManager;
 import com.xxxlc.hideandseek.manager.TeamManager;
 import com.xxxlc.hideandseek.util.MessageUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -62,6 +61,11 @@ public class HideSeekCommand implements CommandExecutor, TabCompleter {
             case "start":
                 gameManager.forcarInicio();
                 MessageUtil.sendSuccess(p, "Ciclo de jogo iniciado forçadamente.");
+                break;
+
+            case "stop":
+                gameManager.forcarParada();
+                MessageUtil.sendSuccess(p, "O jogo foi parado e resetado.");
                 break;
 
             case "itens":
@@ -125,6 +129,7 @@ public class HideSeekCommand implements CommandExecutor, TabCompleter {
     private void sendHelp(Player p) {
         MessageUtil.sendHelp(p, "Hide and Seek",
                 " &e /hs start &8- &7Inicia o ciclo do jogo",
+                " &e /hs stop &8- &7Para o jogo imediatamente",
                 " &e /hs itens <kit> &8- &7Define kits iniciais",
                 " &e /hs pegadorspawn set &8- &7Define onde a fera nasce",
                 " &e /hs setpegadorespera &8- &7Define sala de espera (2min)",
@@ -181,7 +186,7 @@ public class HideSeekCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> s = new ArrayList<>();
         if (args.length == 1) {
-            s.add("start"); s.add("itens"); s.add("help"); s.add("info"); s.add("blacklist");
+            s.add("start"); s.add("stop"); s.add("itens"); s.add("help"); s.add("info"); s.add("blacklist");
             s.add("pegadorspawn"); s.add("escondedorspawn"); s.add("endspawn"); s.add("setpegadorespera");
             s.add("setminplayers"); s.add("settempopartida");
         }
